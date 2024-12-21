@@ -1,67 +1,31 @@
-# Настройка Codemagic для Flutter проекта
 workflows:
-  # Основной workflow
   flutter-build:
     name: Build Flutter app
-    max_build_duration: 120 # максимальное время сборки в минутах
-
-    # Указываем, на какой платформе будем собирать (iOS и Android)
+    # Указываем платформу, для которой выполняем сборку
     platform: flutter
-
-    # Параметры для Android
-    android:
-      # Параметры для сборки Android
-      gradle:
-        # Используем Gradle для сборки Android
-        build:
-          - flutter build apk --release
-        # Тестирование Android
-        test:
-          - flutter test
-
-    # Параметры для iOS
-    ios:
-      # Указываем путь к проекту iOS
-      xcode_project: ios/Runner.xcodeproj
-      # Параметры для сборки iOS
-      build:
-        - flutter build ios --release --no-codesign
-      # Тестирование iOS
-      test:
-        - flutter test
-      # Подпись для iOS
-      signing:
-        # Здесь можно указать сертификаты и профиль для подписи приложения
-        team_id: <your_team_id>
-        profile: <your_provisioning_profile>
     
-    # Окружение (например, для установки зависимостей)
-    environment:
-      flutter: stable
-      sdk: stable
-      node: stable
-
-    # Шаги до сборки
+    # Указываем, что нужно сделать с Android и iOS
+    android:
+      # Используем команду Flutter для сборки Android
+      flutter:
+        channel: stable
+        build: apk --release
+        
+    ios:
+      # Используем команду Flutter для сборки iOS
+      flutter:
+        channel: stable
+        build: ios --release --no-codesign
+        
+    # Перед сборкой установить зависимости
     pre_build:
-      # Устанавливаем зависимости для проекта
       - flutter pub get
-
-    # Артефакты (файлы, которые нужно собрать после сборки)
+    
+    # После сборки выполнить дополнительные шаги
+    post_build:
+      - echo "Build finished!"
+    
+    # Артефакты (что нужно сохранить после сборки)
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
       - build/ios/iphoneos/Runner.app
-
-    # Скрипты после сборки
-    post_build:
-      - echo "Build finished!"
-
-  # Альтернативный workflow, например, для тестов
-  flutter-test:
-    name: Run Flutter tests
-    platform: flutter
-    pre_build:
-      - flutter pub get
-    test:
-      - flutter test
-    post_build:
-      - echo "Tests finished!"
